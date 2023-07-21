@@ -11,7 +11,7 @@ return [
      | Supported: "mail", "slack". You can use multiple drivers.
      |
      */
-    'drivers' => ['mail', 'slack'],
+    'drivers' => ['mail'],
 
     /*
      |--------------------------------------------------------------------------
@@ -35,7 +35,7 @@ return [
     'mail' => [
         'from' => 'sender@example.com',
         'to' => 'recipient@example.com',
-        'view' => 'laravel-exception-monitor::email'
+        'view' => 'exception-monitor::email'
     ],
 
     /*
