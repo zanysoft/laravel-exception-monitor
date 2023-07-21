@@ -7,21 +7,21 @@ This package notifies you when exceptions are thrown on some of your production 
 
 #### Installation
 ``` bash
-composer require famdirksen/laravel-exception-monitor
+composer require zanysoft/laravel-exception-monitor
 ```
 
 Next, you need to register Service Provider in `config/app.php`
 ```php
 $providers = [
     ...
-    Famdirksen\LaravelExceptionMonitor\ExceptionMonitorServiceProvider::class,
+    ZanySoft\LaravelExceptionMonitor\ExceptionMonitorServiceProvider::class,
     ...
 ];
 ```
 
 and then publish configuration files
 ```
-php artisan vendor:publish --provider="Famdirksen\LaravelExceptionMonitor\ExceptionMonitorServiceProvider"
+php artisan vendor:publish --provider="ZanySoft\LaravelExceptionMonitor\ExceptionMonitorServiceProvider"
 ```
 
 You also have to make sure if you have [makzn/slack](https://github.com/maknz/slack) package installed and configured properly for Slack notifications.
@@ -85,7 +85,7 @@ To start catching exceptions you have 2 options out there.
 
 **First option**: Extend from Exception Handler provided by package (`app/Exceptions/Handler.php`):
 ```php
-use Famdirksen\LaravelExceptionMonitor\MonitorExceptionHandler;
+use ZanySoft\LaravelExceptionMonitor\MonitorExceptionHandler;
 ...
 class Handler extends MonitorExceptionHandler
 ```
