@@ -9,7 +9,6 @@ class MailDriver implements DriverInterface
 
     protected $mailer;
 
-
     /**
      * MailDriver constructor.
      *
@@ -20,7 +19,6 @@ class MailDriver implements DriverInterface
         $this->mailer = $mailer;
     }
 
-
     /**
      * It sends e-mail notification for a given exception.
      *
@@ -30,10 +28,18 @@ class MailDriver implements DriverInterface
     {
         $config = config('exception-monitor.mail');
 
-        $this->mailer->send($config['view'], [ 'e' => $exception ], function ($m) use ($config) {
+        $code = $exception->getCode();
+
+        $subject = 'A exception has been thrown on ' . config('app.url');
+
+        $title = $code ? $code . ' Exception' : 'Error Exception';
+
+        $exception = $e = \ZanySoft\LaravelExceptionMonitor\Exception\FlattenException::create($exception);
+
+        $this->mailer->send($config['view'], compact('exception', 'e', 'subject', 'title'), function ($m) use ($config, $subject) {
             $m->from($config['from']);
             $m->to($config['to']);
-            $m->subject('A exception has been thrown on ' . config('app.url'));
+            $m->subject($subject);
         });
     }
 }
