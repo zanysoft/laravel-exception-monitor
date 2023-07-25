@@ -377,7 +377,7 @@ class Slack
         $attachment_fields = [];
         foreach ($fields as $field) {
             $value = $field['value'] ?? null;
-            $short = $field['value'] ?? false;
+            $short = $field['short'] ?? false;
             if ($value) {
                 $attachment_fields[] = [
                     'title' => $field['title'] ?? null,
