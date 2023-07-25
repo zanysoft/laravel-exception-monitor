@@ -28,7 +28,7 @@ class MailDriver implements DriverInterface
      *
      * @param \Exception $exception
      */
-    public function send(\Exception $exception)
+    public function send($exception)
     {
         $config = config('exception-monitor.mail');
 

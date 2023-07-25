@@ -23,8 +23,11 @@ class SlackDriver implements DriverInterface
         $this->slack = $slack;
     }
 
-
-    public function send(\Exception $exception)
+    /**
+     * @param \Exception $exception
+     * @return void
+     */
+    public function send($exception)
     {
         $config     = config('exception-monitor.slack');
         $message    = 'Exception has been thrown on `' . config('app.url') . '`';

@@ -10,7 +10,7 @@ class ExceptionMonitor
      *
      * @param \Exception $e
      */
-    public function notifyException(\Exception $e)
+    public function notifyException($e)
     {
         $drivers = config('exception-monitor.drivers');
 
@@ -31,7 +31,7 @@ class ExceptionMonitor
      * @param \Exception $e
      * @param            $driver
      */
-    protected function sendException(\Exception $e, $driver)
+    protected function sendException( $e, $driver)
     {
         $channel = $this->getDriverInstance($driver);
         $channel->send($e);

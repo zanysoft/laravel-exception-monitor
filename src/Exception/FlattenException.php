@@ -42,17 +42,23 @@ class FlattenException
     private $line;
 
     /**
-     * @return static
+     * @param \Exception $exception
+     * @param int|null $statusCode
+     * @param array $headers
+     * @return self
      */
-    public static function create(\Exception $exception, int $statusCode = null, array $headers = []): self
+    public static function create($exception, $statusCode = null, array $headers = []): self
     {
         return static::createFromThrowable($exception, $statusCode, $headers);
     }
 
     /**
-     * @return static
+     * @param \Exception $exception
+     * @param int|null $statusCode
+     * @param array $headers
+     * @return self
      */
-    public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): self
+    public static function createFromThrowable($exception, int $statusCode = null, array $headers = []): self
     {
         $e = new static();
         $e->setMessage($exception->getMessage());
@@ -303,9 +309,10 @@ class FlattenException
     }
 
     /**
-     * @return $this
+     * @param \Exception $throwable
+     * @return self
      */
-    private function setTraceFromThrowable(\Throwable $throwable): self
+    private function setTraceFromThrowable($throwable): self
     {
         $this->traceAsString = $throwable->getTraceAsString();
 
