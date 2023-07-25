@@ -36,7 +36,7 @@ Publish the package config and view files to your application. Run these command
 php artisan vendor:publish --provider="ZanySoft\LaravelExceptionMonitor\ExceptionMonitorServiceProvider"
 ```
 
-You also have to make sure if you have [makzn/slack](https://github.com/maknz/slack) package installed and configured properly for Slack notifications.
+You need set [Incoming Webhooks](https://my.slack.com/services/new/incoming-webhook) for sending messages to Slack.
 
 #### Configuration
 
@@ -94,12 +94,13 @@ return [
     ],
 
     /*
-     * Uses maknz\slack package.
+     * set endpoint url from Incoming WebHooks https://my.slack.com/services/new/incoming-webhook
      */
-    'slack'        => [
-        'channel'  => '#bugtracker',
+    'slack' => [
+        'endpoint' => 'https://hooks.slack.com/services/....',
+        'channel' => '#bugtracker',
         'username' => 'Exception Monitor',
-        'icon'     => ':robot_face:',
+        'icon' => ':robot_face:',
     ],
 ];
 ```

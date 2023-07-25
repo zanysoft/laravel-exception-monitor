@@ -3,24 +3,26 @@
 namespace ZanySoft\LaravelExceptionMonitor\Drivers;
 
 use Carbon\Carbon;
-use Maknz\Slack\Attachment;
-use Maknz\Slack\AttachmentField;
-use Maknz\Slack\Client as Slack;
+use ZanySoft\LaravelExceptionMonitor\Lib\Slack;
 
 class SlackDriver implements DriverInterface
 {
 
+    /**
+     * @var Slack
+     */
     protected $slack;
 
+    protected $config;
 
     /**
      * SlackDriver constructor.
-     *
-     * @param Slack $slack
      */
-    public function __construct(Slack $slack)
+    public function __construct()
     {
-        $this->slack = $slack;
+        $this->config = config('exception-monitor.slack');
+
+        $this->slack = new Slack($this->config['endpoint']);
     }
 
     /**
@@ -29,39 +31,38 @@ class SlackDriver implements DriverInterface
      */
     public function send($exception)
     {
-        $config     = config('exception-monitor.slack');
-        $message    = 'Exception has been thrown on `' . config('app.url') . '`';
-        $attachment = new Attachment([
-            'color'  => 'danger',
+        $config = $this->config;
+        $message = 'Exception has been thrown on `' . config('app.url') . '`';
+        $attachment = [
+            'color' => 'danger',
             'fields' => [
-                new AttachmentField([
+                [
                     'title' => 'Message',
                     'value' => $exception->getMessage(),
-                    'short' => true
-                ]),
-                new AttachmentField([
+                    'short' => false
+                ],
+                [
                     'title' => 'File',
                     'value' => $exception->getFile() . ':' . $exception->getLine(),
-                    'short' => true
-                ]),
-
-                new AttachmentField([
+                    'short' => false
+                ],
+                [
                     'title' => 'Request',
-                    'value' => app('request')->getRequestUri(),
-                    'short' => true
-                ]),
-                new AttachmentField([
+                    'value' => strtolower(app('request')->getMethod()) . ': ' . app('request')->url(),
+                    'short' => false
+                ],
+                [
                     'title' => 'Timestamp',
                     'value' => Carbon::now()->toDateTimeString(),
                     'short' => true
-                ]),
-                new AttachmentField([
+                ],
+                [
                     'title' => 'User',
                     'value' => auth()->check() ? auth()->user()->id : 'Not logged in',
                     'short' => true
-                ])
+                ]
             ]
-        ]);
+        ];
 
         $this->slack->to($config['channel'])->from($config['username'])->attach($attachment)->withIcon($config['icon'])->send($message);
     }

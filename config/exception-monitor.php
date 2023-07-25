@@ -49,9 +49,10 @@ return [
     ],
 
     /*
-     * Uses maknz\slack package.
+     * set endpoint url from Incoming WebHooks https://my.slack.com/services/new/incoming-webhook
      */
     'slack' => [
+        'endpoint' => 'https://hooks.slack.com/services/....',
         'channel' => '#bugtracker',
         'username' => 'Exception Monitor',
         'icon' => ':robot_face:',
