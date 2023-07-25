@@ -3,10 +3,14 @@
 namespace ZanySoft\LaravelExceptionMonitor\Drivers;
 
 use Illuminate\Contracts\Mail\Mailer;
+use ZanySoft\LaravelExceptionMonitor\Exception\FlattenException;
 
 class MailDriver implements DriverInterface
 {
 
+    /**
+     * @var Mailer
+     */
     protected $mailer;
 
     /**
@@ -34,11 +38,22 @@ class MailDriver implements DriverInterface
 
         $title = $code ? $code . ' Exception' : 'Error Exception';
 
-        $exception = $e = \ZanySoft\LaravelExceptionMonitor\Exception\FlattenException::create($exception);
+        $exception = $e = FlattenException::create($exception);
 
-        $this->mailer->send($config['view'], compact('exception', 'e', 'subject', 'title'), function ($m) use ($config, $subject) {
-            $m->from($config['from']);
-            $m->to($config['to']);
+        $from = $config['from'] ?? '';
+        if (!$from) {
+            $from = [config('mail.from.address') => config('mail.from.name')];
+        }
+
+        $to = $config['to'];
+        if (!is_array($to)) {
+            $to = preg_replace('/\s+/', '', $to);
+            $to = explode(',', $to);
+        }
+
+        $this->mailer->send($config['view'], compact('exception', 'e', 'subject', 'title'), function ($m) use ($from, $to, $subject) {
+            $m->from($from);
+            $m->to($to);
             $m->subject($subject);
         });
     }
