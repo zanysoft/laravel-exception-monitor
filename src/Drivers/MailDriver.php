@@ -42,7 +42,12 @@ class MailDriver implements DriverInterface
 
         $from = $config['from'] ?? '';
         if (!$from) {
-            $from = [config('mail.from.address') => config('mail.from.name')];
+            if (config('mail.from.address')) {
+                $from = [config('mail.from.address') => config('mail.from.name')];
+            } else {
+                $femail = 'no-reply@' . $_SERVER['HTTP_HOST'];
+                $from = [$femail => config('app.name')];
+            }
         }
 
         $to = $config['to'];

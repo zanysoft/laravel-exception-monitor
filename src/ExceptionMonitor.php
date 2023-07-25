@@ -2,16 +2,40 @@
 
 namespace ZanySoft\LaravelExceptionMonitor;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Session\TokenMismatchException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+
 class ExceptionMonitor
 {
 
     /**
      * It calls all enabled drivers and triggers requests to send notifications.
      *
-     * @param \Exception $e
+     * @param \Exception $exception
      */
-    public function notifyException($e)
+    public function notifyException($exception)
     {
+        $code = $this->errorCodeFromException($exception);
+
+        if ($exception instanceof TokenMismatchException) {
+            return;
+        }
+
+        if ($exception instanceof ModelNotFoundException) {
+            return;
+        }
+
+        $skip_error = config('exception-monitor.skip_error');
+
+        if (!is_array($skip_error)) {
+            $skip_error = array_map('trim', explode(',', $skip_error));
+        }
+
+        if (in_array($code, $skip_error)) {
+            return;
+        }
+
         $drivers = config('exception-monitor.drivers');
 
         if ($this->enabledEnvironment(app()->environment())) {
@@ -20,35 +44,33 @@ class ExceptionMonitor
             }
 
             foreach ($drivers as $driver) {
-                $this->sendException($e, $driver);
+                $this->sendException($exception, $driver);
             }
         }
     }
 
     /**
-     * It sends notification to given driver.
-     *
-     * @param \Exception $e
-     * @param            $driver
+     * @param \Throwable $exception
+     * @return int
      */
-    protected function sendException( $e, $driver)
+    protected function errorCodeFromException($exception)
     {
-        $channel = $this->getDriverInstance($driver);
-        $channel->send($e);
+        if ($this->isHttpException($exception)) {
+            return $exception->getStatusCode();
+        }
+
+        return $exception->getCode();
     }
 
     /**
-     * It injects driver's class to Laravel application.
+     * Determine if the given exception is an HTTP exception.
      *
-     * @param $driver
-     *
-     * @return mixed
+     * @param \Throwable $exception
+     * @return bool
      */
-    protected function getDriverInstance($driver)
+    protected function isHttpException($exception)
     {
-        $class = '\ZanySoft\LaravelExceptionMonitor\Drivers\\' . ucfirst(trim($driver)) . 'Driver';
-
-        return app($class);
+        return $exception instanceof HttpExceptionInterface;
     }
 
     /**
@@ -67,5 +89,31 @@ class ExceptionMonitor
         }
 
         return $environment === $environments;
+    }
+
+    /**
+     * It sends notification to given driver.
+     *
+     * @param \Exception $e
+     * @param            $driver
+     */
+    protected function sendException($e, $driver)
+    {
+        $channel = $this->getDriverInstance($driver);
+        $channel->send($e);
+    }
+
+    /**
+     * It injects driver's class to Laravel application.
+     *
+     * @param $driver
+     *
+     * @return mixed
+     */
+    protected function getDriverInstance($driver)
+    {
+        $class = '\ZanySoft\LaravelExceptionMonitor\Drivers\\' . ucfirst(trim($driver)) . 'Driver';
+
+        return app($class);
     }
 }
