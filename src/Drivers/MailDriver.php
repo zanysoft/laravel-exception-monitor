@@ -31,8 +31,6 @@ class MailDriver implements DriverInterface
      */
     public function send($exception)
     {
-        $config = config('exception-monitor.mail');
-
         $code = $exception->getCode();
 
         $app_name = Str::title(config('app.name'));
@@ -44,7 +42,7 @@ class MailDriver implements DriverInterface
 
         $exception = $e = FlattenException::create($exception);
 
-        $from = $config['from'] ?? '';
+        $from = config('exception-monitor.mail.from', '');
         if (empty($from)) {
             if (config('mail.from.address')) {
                 $from = [config('mail.from.address') => config('mail.from.name')];
@@ -54,13 +52,14 @@ class MailDriver implements DriverInterface
             }
         }
 
-        $to = $config['to'] ?? '';
+        $to = config('exception-monitor.mail.to', '');
         if (!empty($to) && !is_array($to)) {
             $to = preg_replace('/\s+/', '', $to);
             $to = explode(',', $to);
         }
 
-        $this->mailer->send($config['view'], compact('exception', 'e', 'subject', 'title'), function ($m) use ($from, $to, $subject) {
+        $view = config('exception-monitor.mail.view', '');
+        $this->mailer->send($view, compact('exception', 'e', 'subject', 'title'), function ($m) use ($from, $to, $subject) {
             $m->from($from);
             $m->to($to);
             $m->subject($subject);

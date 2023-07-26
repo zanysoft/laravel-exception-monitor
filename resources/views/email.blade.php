@@ -27,7 +27,7 @@
                 </tr>
                 <tr>
                     <th>Request:</th>
-                    <td><span style="margin-right: 3px">{{ request()->getMethod() }}:</span> {{ request()->url() }}</td>
+                    <td><span style="margin-right: 3px">{{ strtolower(request()->getMethod()) }}:</span>&nbsp;{{ request()->url() }}</td>
                 </tr>
                 <tr>
                     <th>Date:</th>
@@ -58,6 +58,8 @@
                         $class = $trace['class'] ?? '';
                         $type = $trace['type'] ?? '';
                         $args = $trace['args'] ?? '';
+                        $file = $trace['file'] ?? '';
+                        $line = $trace['line'] ?? '';
                     @endphp
 
                     <tr>
@@ -67,18 +69,16 @@
                                 @if($function)
                                     @if($class)
                                         <span class="trace-class">{{ $class }}</span>
-                                        @if($trace['type'])
-                                            <span class="trace-type">{{ $trace['type']??' ' }}</span>
+                                        @if($type)
+                                            <span class="trace-type">{{ $type }}</span>
                                         @endif
                                     @endif
                                     <span class="trace-method">
-                                        {!! $function.'('. sprintf('<span class="trace-arguments">%s</span>', $exception->formatArgs($args)) .')' !!}
+                                        {!! $function !!}(<span class="trace-arguments">{!! $exception->formatArgs($args) !!}</span>)
                                     </span>
                                 @endif
-                                @if($trace['file'])
-                                    <span class="block trace-file-path">
-                                    in {{ $trace['file'] }} (line: {{ $trace['line']??'' }})
-                                    </span>
+                                @if($file)
+                                    <span class="block trace-file-path">in {{ $file }} (line: {{ $line }})</span>
                                 @endif
                             </div>
                         </td>
