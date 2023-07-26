@@ -57,27 +57,18 @@ class Slack
     protected $iconType;
 
     /**
-     * Whether the message text should be interpreted in Slack's
-     * Markdown-like language
-     *
-     * @var boolean
-     */
-    protected $allow_markdown = true;
-
-    /**
-     * The attachment fields which should be formatted with
-     * Slack's Markdown-like language
-     *
-     * @var array
-     */
-    protected $markdown_in_attachments = [];
-
-    /**
      * An array of attachments to send
      *
      * @var array
      */
     protected $attachments = [];
+
+    /**
+     *  allow markdown
+     *
+     * @var array
+     */
+    protected $allow_markdown = true;
 
     /**
      *
@@ -107,27 +98,9 @@ class Slack
 
         if (isset($attributes['icon'])) $this->setIcon($attributes['icon']);
 
-        /*if (isset($attributes['link_names'])) $this->setLinkNames($attributes['link_names']);
+        if (isset($attributes['allow_markdown'])) $this->allow_markdown = $attributes['allow_markdown'];
 
-        if (isset($attributes['unfurl_links'])) $this->setUnfurlLinks($attributes['unfurl_links']);
-
-        if (isset($attributes['unfurl_media'])) $this->setUnfurlMedia($attributes['unfurl_media']);*/
-
-        if (isset($attributes['allow_markdown'])) $this->setAllowMarkdown($attributes['allow_markdown']);
-
-        if (isset($attributes['markdown_in_attachments'])) $this->setMarkdownInAttachments($attributes['markdown_in_attachments']);
-
-        $this->client = new Client();
-    }
-
-    /**
-     * Get the message text
-     *
-     * @return string
-     */
-    public function getText()
-    {
-        return $this->text;
+        $this->client = new Client(['verify' => false]);
     }
 
     /**
@@ -144,16 +117,6 @@ class Slack
     }
 
     /**
-     * Get the channel we will post to
-     *
-     * @return string
-     */
-    public function getChannel()
-    {
-        return $this->channel;
-    }
-
-    /**
      * Set the channel we will post to
      *
      * @param string $channel
@@ -167,16 +130,6 @@ class Slack
     }
 
     /**
-     * Get the username we will post as
-     *
-     * @return string
-     */
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    /**
      * Set the username we will post as
      *
      * @param string $username
@@ -187,16 +140,6 @@ class Slack
         $this->username = $username;
 
         return $this;
-    }
-
-    /**
-     * Get the icon (either URL or emoji) we will post as
-     *
-     * @return string
-     */
-    public function getIcon()
-    {
-        return $this->icon;
     }
 
     /**
@@ -220,90 +163,6 @@ class Slack
         }
 
         $this->icon = $icon;
-
-        return $this;
-    }
-
-    /**
-     * Get the icon type being used, if an icon is set
-     *
-     * @return string
-     */
-    public function getIconType()
-    {
-        return $this->iconType;
-    }
-
-    /**
-     * Get whether message text should be formatted with
-     * Slack's Markdown-like language
-     *
-     * @return boolean
-     */
-    public function getAllowMarkdown()
-    {
-        return $this->allow_markdown;
-    }
-
-    /**
-     * Set whether message text should be formatted with
-     * Slack's Markdown-like language
-     *
-     * @param boolean $value
-     * @return void
-     */
-    public function setAllowMarkdown($value)
-    {
-        $this->allow_markdown = (boolean)$value;
-
-        return $this;
-    }
-
-    /**
-     * Enable Markdown formatting for the message
-     *
-     * @return void
-     */
-    public function enableMarkdown()
-    {
-        $this->setAllowMarkdown(true);
-
-        return $this;
-    }
-
-    /**
-     * Disable Markdown formatting for the message
-     *
-     * @return void
-     */
-    public function disableMarkdown()
-    {
-        $this->setAllowMarkdown(false);
-
-        return $this;
-    }
-
-    /**
-     * Get the attachment fields which should be formatted
-     * in Slack's Markdown-like language
-     *
-     * @return array
-     */
-    public function getMarkdownInAttachments()
-    {
-        return $this->markdown_in_attachments;
-    }
-
-    /**
-     * Set the attachment fields which should be formatted
-     * in Slack's Markdown-like language
-     *
-     * @param array $fields
-     * @return $this
-     */
-    public function setMarkdownInAttachments(array $fields)
-    {
-        $this->markdown_in_attachments = $fields;
 
         return $this;
     }
@@ -354,24 +213,15 @@ class Slack
      * @param $fields
      * @return $this
      */
-    public function attach($options, $fields = [])
+    public function attach($options)
     {
-        if (empty($fields)) {
-            $fields = $options['fields'] ?? [];
-        }
+        $fields = $options['fields'] ?? [];
+
         $attachment = [
-            'fallback' => $options['fallback'] ?? null,
-            'text' => $options['text'] ?? null,
-            'pretext' => $options['pretext'] ?? null,
-            'color' => $options['color'] ?? 'danger',
-            'mrkdwn_in' => $options['mrkdwn_in'] ?? $this->getMarkdownInAttachments(),
-            'image_url' => $options['image_url'] ?? null,
-            'thumb_url' => $options['thumb_url'] ?? null,
             'title' => $options['title'] ?? null,
-            'title_link' => $options['title_link'] ?? null,
-            'author_name' => $options['author_name'] ?? null,
-            'author_link' => $options['author_link'] ?? null,
-            'author_icon' => $options['author_icon'] ?? null
+            'text' => $options['text'] ?? null,
+            'color' => $options['color'] ?? 'danger',
+            'ts' => time(),
         ];
 
         $attachment_fields = [];
@@ -386,22 +236,11 @@ class Slack
                 ];
             }
         }
-
         $attachment['fields'] = $attachment_fields;
 
         $this->attachments[] = $attachment;
 
         return $this;
-    }
-
-    /**
-     * Get the attachments for the message
-     *
-     * @return array
-     */
-    public function getAttachments()
-    {
-        return $this->attachments;
     }
 
     /**
@@ -453,36 +292,22 @@ class Slack
      */
     protected function sendMessage()
     {
-        $payload = $this->preparePayload();
+        $payload = [
+            'text' => $this->text,
+            'channel' => $this->channel,
+            'username' => $this->username,
+            'mrkdwn' => $this->allow_markdown,
+        ];
+
+        if ($icon = $this->icon) {
+            $payload[$this->iconType] = $icon;
+        }
+
+        $payload['attachments'] = $this->attachments;
+        //dd($payload);
 
         $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE);
 
         $this->client->post($this->endpoint, ['body' => $encoded]);
-    }
-
-    /**
-     * Prepares the payload to be sent to the webhook
-     *
-     * @return array
-     */
-    protected function preparePayload()
-    {
-        $payload = [
-            'text' => $this->getText(),
-            'channel' => $this->getChannel(),
-            'username' => $this->getUsername(),
-            //'link_names' => $this->getLinkNames() ? 1 : 0,
-            //'unfurl_links' => $this->getUnfurlLinks(),
-            //'unfurl_media' => $this->getUnfurlMedia(),
-            'mrkdwn' => $this->getAllowMarkdown()
-        ];
-
-        if ($icon = $this->getIcon()) {
-            $payload[$this->getIconType()] = $icon;
-        }
-
-        $payload['attachments'] = $this->getAttachments();
-
-        return $payload;
     }
 }

@@ -8,7 +8,7 @@ Laravel Exception Monitor
 
 This package notifies you when exceptions are thrown on some of your production application.
 
-![Slack Preview](/preview.png)
+![Slack Preview](/preview.jpg)
 
 #### Installation
 
