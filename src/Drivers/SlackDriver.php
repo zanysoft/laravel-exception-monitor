@@ -32,17 +32,17 @@ class SlackDriver implements DriverInterface
     public function send($exception)
     {
         $user = 'Not logged in';
-        if (auth('admin')->check()) {
+        if (auth()->check()) {
             try {
-                $columns = auth('admin')->user()->getAttributes();
+                $columns = auth()->user()->getAttributes();
                 foreach (['name', 'fullname', 'firstname', 'first_name'] as $col) {
                     if (array_key_exists($col, $columns)) {
-                        $user = $columns[$col] . ' (' . auth('admin')->user()->id . ')';
+                        $user = $columns[$col] . ' (' . auth()->user()->id . ')';
                         break;
                     }
                 }
             } catch (\Exception $e) {
-                $user = auth('admin')->user()->id;
+                $user = auth()->user()->id;
             }
         }
 
