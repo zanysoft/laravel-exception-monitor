@@ -1,10 +1,10 @@
-Laravel Exception Monitor
-=========================
 
-[![Laravel](https://img.shields.io/badge/Laravel-5.x-orange.svg?style=flat-square)](http://laravel.com)
-[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
+
 [![Downloads](https://img.shields.io/packagist/dt/zanysoft/laravel-exception-monitor.svg?style=flat-square)](https://packagist.org/packages/zanysoft/laravel-exception-monitor)
+[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
 [![GitHub tag](https://img.shields.io/github/tag/ZanySoft/laravel-exception-monitor.svg?style=flat&color=informational)](https://github.com/zanysoft/laravel-exception-monitor/tags)
+
+# Laravel Exception Monitor
 
 This package notifies you when exceptions are thrown on some of your production application.
 
